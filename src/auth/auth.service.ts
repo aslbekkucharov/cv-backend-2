@@ -3,13 +3,12 @@ import { compare, hash } from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 
-import SignInDto from './dto/signin.dto';
+import { AuthResponse } from './types';
 import { TokenPayload } from 'src/types';
-import { User } from 'src/users/entities/user.entity';
+import SignInDto from './dto/signin.dto';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/common/dto/create-user.dto';
-import { ConfigService } from '@nestjs/config';
-import { AuthResponse } from './types';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +16,7 @@ export class AuthService {
     constructor(private jwtService: JwtService, private usersService: UsersService, private configService: ConfigService) { }
 
     async signIn(payload: SignInDto): Promise<AuthResponse> {
-        const user = await this.usersService.findOne(payload.username)
+        const user = await this.usersService.findOne(payload.username, ['password'])
 
         if (!user) throw new NotFoundException('Пользователь не найден')
 

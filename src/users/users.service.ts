@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,18 +16,31 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.userRepository.find()
   }
 
-  findOne(username: string) {
-    return this.userRepository.findOne({ where: { username } })
+  findOne(username: string, selectFields?: Array<keyof User>): Promise<User | undefined> {
+    const fieldsToSelect = selectFields ? selectFields : []
+
+    return this.userRepository.findOne({
+      where: { username },
+      select: ['email', 'fullname', 'id', 'username', ...fieldsToSelect]
+    })
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(username: string, updateUserDto: UpdateUserDto) {
+    await this.userRepository.update({ username }, updateUserDto)
+    const user = await this.findOne(updateUserDto.username)
+    return user
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(username: string) {
+    const user = await this.findOne(username)
+
+    if (!user) {
+      throw new NotFoundException('Пользователь с таким именем пользователя не существует')
+    }
+
+    return await this.userRepository.remove(user)
   }
 }

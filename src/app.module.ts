@@ -5,7 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from './users/entities/user.entity'
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './auth/auth.module'
+import { PostsModule } from './posts/posts.module'
+import { Post } from './posts/entities/post.entity'
 
 @Module({
   providers: [],
@@ -21,12 +23,13 @@ import { AuthModule } from './auth/auth.module';
           host: configService.get<string>('DB_HOST', 'localhost'),
           password: configService.get<string>('DB_PASSWORD', 'password'),
           username: configService.get<string>('DB_USERNAME', 'user'),
-          entities: [User],
+          entities: [User, Post],
         }
       }
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+    PostsModule
   ],
 })
 
