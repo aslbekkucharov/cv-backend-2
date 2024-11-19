@@ -2,7 +2,7 @@ import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator"
 
 export class CreateUserDto {
     @IsNotEmpty({ message: 'Поле обязательно для заполнения' })
-    @IsString({ message: 'Придумайте имя уникальное имя пользователя' })
+    @IsString({ message: 'Придумайте уникальное имя пользователя' })
     username: string
 
     @IsNotEmpty({ message: 'Поле обязятально для заполнения' })

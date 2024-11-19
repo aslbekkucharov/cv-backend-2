@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from './users/entities/user.entity'
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   providers: [],
@@ -24,7 +25,8 @@ import { DataSource } from 'typeorm'
         }
       }
     }),
-    UsersModule
+    UsersModule,
+    AuthModule
   ],
 })
 
