@@ -23,14 +23,13 @@ import { Post } from './posts/entities/post.entity'
           host: configService.get<string>('DB_HOST', 'localhost'),
           password: configService.get<string>('DB_PASSWORD', 'password'),
           username: configService.get<string>('DB_USERNAME', 'user'),
-          entities: [User, Post],
+          entities: [User, Post]
         }
       }
     }),
     UsersModule,
     AuthModule,
     PostsModule
-  ],
+  ]
 })
-
-export class AppModule { }
+export class AppModule {}

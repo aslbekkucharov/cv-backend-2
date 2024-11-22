@@ -1,15 +1,16 @@
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Repository } from 'typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable, NotFoundException } from '@nestjs/common'
 
-import { User } from './entities/user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from 'src/common/dto/create-user.dto';
+import { User } from './entities/user.entity'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { CreateUserDto } from 'src/common/dto/create-user.dto'
 
 @Injectable()
 export class UsersService {
-
-  constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>
+  ) {}
 
   create(createUserDto: CreateUserDto) {
     return this.userRepository.save(createUserDto)
@@ -19,7 +20,10 @@ export class UsersService {
     return this.userRepository.find()
   }
 
-  findOne(username: string, selectFields?: Array<keyof User>): Promise<User | undefined> {
+  findOne(
+    username: string,
+    selectFields?: Array<keyof User>
+  ): Promise<User | undefined> {
     const fieldsToSelect = selectFields ? selectFields : []
 
     return this.userRepository.findOne({
@@ -38,7 +42,9 @@ export class UsersService {
     const user = await this.findOne(username)
 
     if (!user) {
-      throw new NotFoundException('Пользователь с таким именем пользователя не существует')
+      throw new NotFoundException(
+        'Пользователь с таким именем пользователя не существует'
+      )
     }
 
     return await this.userRepository.remove(user)

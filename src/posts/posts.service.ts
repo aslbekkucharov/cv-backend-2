@@ -1,17 +1,23 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Post } from './entities/post.entity';
-import { Repository } from 'typeorm';
-import { UsersService } from 'src/users/users.service';
-import { Pagination } from 'src/decorators/pagination-params.decorator';
-import { PaginatedResource } from 'src/common/dto/paginated-resourse.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common'
+import { CreatePostDto } from './dto/create-post.dto'
+import { UpdatePostDto } from './dto/update-post.dto'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Post } from './entities/post.entity'
+import { Repository } from 'typeorm'
+import { UsersService } from 'src/users/users.service'
+import { Pagination } from 'src/decorators/pagination-params.decorator'
+import { PaginatedResource } from 'src/common/dto/paginated-resourse.dto'
 
 @Injectable()
 export class PostsService {
-
-  constructor(@InjectRepository(Post) private postRepository: Repository<Post>, private userService: UsersService) { }
+  constructor(
+    @InjectRepository(Post) private postRepository: Repository<Post>,
+    private userService: UsersService
+  ) {}
 
   async create(createPostDto: CreatePostDto, username: string) {
     const user = await this.userService.findOne(username)
@@ -29,7 +35,10 @@ export class PostsService {
     return createdPost
   }
 
-  async findUserPosts(pagination: Pagination, username: string): Promise<PaginatedResource<Post>> {
+  async findUserPosts(
+    pagination: Pagination,
+    username: string
+  ): Promise<PaginatedResource<Post>> {
     const [posts, total] = await this.postRepository.findAndCount({
       take: pagination.limit,
       skip: pagination.offset,
@@ -56,7 +65,6 @@ export class PostsService {
   }
 
   async remove(slug: string) {
-
     const post = await this.findOne(slug)
 
     if (!post) {
