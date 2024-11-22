@@ -24,7 +24,6 @@ export class UsersService {
 
     return this.userRepository.findOne({
       where: { username },
-      relations: ['posts'],
       select: ['email', 'fullname', 'id', 'username', ...fieldsToSelect]
     })
   }

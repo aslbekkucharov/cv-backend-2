@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
+import { Pagination } from 'src/decorators/pagination-params.decorator';
 
 @Injectable()
 export class PostsService {
@@ -27,9 +28,24 @@ export class PostsService {
     return createdPost
   }
 
-  findAll() {
-    return this.postRepository.find()
+  async findUserPosts(pagination: Pagination, username: string) {
+    const [posts, total] = await this.postRepository.findAndCount({
+      take: pagination.limit,
+      skip: pagination.offset,
+      where: { user: { username } }
+    })
+
+    return {
+      total: total,
+      items: posts,
+      size: pagination.size,
+      page: pagination.page
+    }
   }
+
+  // findAll() {
+  //   return this.postRepository.find()
+  // }
 
   findOne(slug: string) {
     return this.postRepository.findOne({ where: { slug } })
