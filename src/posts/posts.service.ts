@@ -6,6 +6,7 @@ import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Pagination } from 'src/decorators/pagination-params.decorator';
+import { PaginatedResource } from 'src/common/dto/paginated-resourse.dto';
 
 @Injectable()
 export class PostsService {
@@ -28,7 +29,7 @@ export class PostsService {
     return createdPost
   }
 
-  async findUserPosts(pagination: Pagination, username: string) {
+  async findUserPosts(pagination: Pagination, username: string): Promise<PaginatedResource<Post>> {
     const [posts, total] = await this.postRepository.findAndCount({
       take: pagination.limit,
       skip: pagination.offset,
@@ -42,10 +43,6 @@ export class PostsService {
       page: pagination.page
     }
   }
-
-  // findAll() {
-  //   return this.postRepository.find()
-  // }
 
   findOne(slug: string) {
     return this.postRepository.findOne({ where: { slug } })
