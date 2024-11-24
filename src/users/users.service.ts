@@ -8,22 +8,17 @@ import { CreateUserDto } from 'src/common/dto/create-user.dto'
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>
-  ) {}
+  constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
 
-  create(createUserDto: CreateUserDto) {
+  create(createUserDto: CreateUserDto): Promise<CreateUserDto & User> {
     return this.userRepository.save(createUserDto)
   }
 
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.userRepository.find()
   }
 
-  findOne(
-    username: string,
-    selectFields?: Array<keyof User>
-  ): Promise<User | undefined> {
+  findOne(username: string, selectFields?: Array<keyof User>): Promise<User | undefined> {
     const fieldsToSelect = selectFields ? selectFields : []
 
     return this.userRepository.findOne({
@@ -32,21 +27,24 @@ export class UsersService {
     })
   }
 
-  async update(username: string, updateUserDto: UpdateUserDto) {
+  async update(username: string, updateUserDto: UpdateUserDto): Promise<User> {
     await this.userRepository.update({ username }, updateUserDto)
     const user = await this.findOne(updateUserDto.username)
     return user
   }
 
-  async remove(username: string) {
+  async remove(username: string): Promise<User> {
     const user = await this.findOne(username)
 
     if (!user) {
-      throw new NotFoundException(
-        'Пользователь с таким именем пользователя не существует'
-      )
+      throw new NotFoundException('Пользователь не найден')
     }
 
     return await this.userRepository.remove(user)
+  }
+
+  async isEmailExists(email: string): Promise<boolean> {
+    const count = await this.userRepository.count({ where: { email } })
+    return count > 0
   }
 }

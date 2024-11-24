@@ -43,9 +43,6 @@ export class Post {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @ManyToOne(() => User, (user) => user.posts, {
-    eager: false,
-    nullable: false
-  })
+  @ManyToOne(() => User, (user) => user.posts, { eager: false, nullable: false })
   user: User
 }

@@ -21,7 +21,7 @@ export class AuthService {
     private jwtService: JwtService,
     private usersService: UsersService,
     private configService: ConfigService
-  ) {}
+  ) { }
 
   async signIn(payload: SignInDto): Promise<AuthResponse> {
     const user = await this.usersService.findOne(payload.username, ['password'])
@@ -36,7 +36,7 @@ export class AuthService {
 
     const omittedUserObject = omit(user, ['password'])
 
-    const tokenPayload: TokenPayload = { ...omittedUserObject }
+    const tokenPayload: TokenPayload = { ...omittedUserObject, id: user.id }
     const token = await this.jwtService.signAsync(tokenPayload)
 
     return {
@@ -51,22 +51,16 @@ export class AuthService {
     const isUsernameInUse = await this.usersService.findOne(username)
 
     if (!!isUsernameInUse) {
-      throw new BadRequestException(
-        'Указанное имя пользователя уже используется'
-      )
+      throw new BadRequestException('Указанное имя пользователя уже используется')
     }
 
-    const hashedPassword = await hash(
-      password,
-      +this.configService.get<number>('HASH_SALT')
-    )
+    const hashedPassword = await hash(password, +this.configService.get<number>('HASH_SALT'))
 
-    const createdUser = await this.usersService.create({
-      ...payload,
-      password: hashedPassword
-    })
+    const createdUser = await this.usersService.create({ ...payload, password: hashedPassword })
     const omittedUser = omit(createdUser, ['password'])
-    const token = await this.jwtService.signAsync(omit(payload, ['password']))
+
+    const tokenPayload = { ...omit(payload, ['password']), id: createdUser.id }
+    const token = await this.jwtService.signAsync(tokenPayload)
 
     return {
       user: omittedUser,
