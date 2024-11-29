@@ -17,11 +17,9 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private configService: ConfigService
-  ) {}
+  ) { }
 
-  canActivate(
-    context: ExecutionContext
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass()
@@ -35,9 +33,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request)
 
     if (!token) {
-      throw new UnauthorizedException(
-        'Войдите в свой аккаунт чтобы получить доступ к этому ресурсу'
-      )
+      throw new UnauthorizedException('Войдите в свой аккаунт чтобы получить доступ к этому ресурсу')
     }
 
     try {
@@ -47,7 +43,7 @@ export class AuthGuard implements CanActivate {
 
       request.user = payload
     } catch (error) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('У вас нет прав для выполнения этой операции')
     }
 
     return true

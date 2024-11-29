@@ -18,7 +18,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Public()
   @Get()
@@ -32,22 +32,23 @@ export class UsersController {
     return this.usersService.findOne(username)
   }
 
-  @Patch(':username')
-  update(
-    @Param('username') username: string,
-    @Body() updateUserDto: UpdateUserDto
-  ) {
-    return this.usersService.update(username, updateUserDto)
-  }
+  @Patch('me')
+  update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
 
-  @Delete(':username')
-  remove(@Param('username') username: string, @Req() request: Request) {
-    if (request?.user?.username !== username) {
-      throw new ForbiddenException(
-        'У вас нет прав на выполнение этой операции!'
-      )
+    if (!request?.user?.username) {
+      throw new ForbiddenException('У вас нет прав на выполнение этой операции!')
     }
 
-    return this.usersService.remove(username)
+    return this.usersService.update(request?.user?.username, updateUserDto)
+  }
+
+  @Delete('me')
+  remove(@Req() request: Request) {
+
+    if (!request?.user?.username) {
+      throw new ForbiddenException('У вас нет прав на выполнение этой операции!')
+    }
+
+    return this.usersService.remove(request?.user?.username)
   }
 }

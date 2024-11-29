@@ -10,11 +10,11 @@ import { CreateUserDto } from 'src/common/dto/create-user.dto'
 export class UsersService {
   constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
 
-  create(createUserDto: CreateUserDto) {
+  create(createUserDto: CreateUserDto): Promise<CreateUserDto & User> {
     return this.userRepository.save(createUserDto)
   }
 
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.userRepository.find()
   }
 
@@ -38,13 +38,18 @@ export class UsersService {
     return user
   }
 
-  async remove(username: string) {
+  async remove(username: string): Promise<User> {
     const user = await this.findOne(username)
 
     if (!user) {
-      throw new NotFoundException('Пользователь с таким именем пользователя не существует')
+      throw new NotFoundException('Пользователь не найден')
     }
 
     return await this.userRepository.remove(user)
+  }
+
+  async isEmailExists(email: string): Promise<boolean> {
+    const count = await this.userRepository.count({ where: { email } })
+    return count > 0
   }
 }

@@ -4,11 +4,12 @@ import { Body, Controller, Post, Res, UsePipes, ValidationPipe } from '@nestjs/c
 import SignInDto from './dto/signin.dto'
 import { Public } from './public-strategy'
 import { AuthService } from './auth.service'
+import { UsersService } from 'src/users/users.service'
 import { CreateUserDto } from 'src/common/dto/create-user.dto'
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private usersService: UsersService) { }
 
   @Public()
   @Post('signin')
