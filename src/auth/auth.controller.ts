@@ -1,10 +1,5 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UsePipes,
-  ValidationPipe
-} from '@nestjs/common'
+import { Response } from 'express'
+import { Body, Controller, Post, Res, UsePipes, ValidationPipe } from '@nestjs/common'
 
 import SignInDto from './dto/signin.dto'
 import { Public } from './public-strategy'
@@ -13,19 +8,28 @@ import { CreateUserDto } from 'src/common/dto/create-user.dto'
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Public()
   @Post('signin')
   @UsePipes(new ValidationPipe())
-  signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto)
+  async signIn(@Res({ passthrough: true }) response: Response, @Body() signInDto: SignInDto) {
+
+    const result = await this.authService.signIn(signInDto)
+
+    response.cookie('token', result.tokens.access, { httpOnly: true })
+
+    return result
   }
 
   @Public()
   @Post('signup')
   @UsePipes(new ValidationPipe())
-  signUp(@Body() signUpDto: CreateUserDto) {
-    return this.authService.signUp(signUpDto)
+  async signUp(@Res({ passthrough: true }) response: Response, @Body() signUpDto: CreateUserDto) {
+
+    const result = await this.authService.signUp(signUpDto)
+    response.cookie('token', result.tokens.access, { httpOnly: true })
+
+    return result
   }
 }

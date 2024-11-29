@@ -8,9 +8,7 @@ import { CreateUserDto } from 'src/common/dto/create-user.dto'
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>
-  ) {}
+  constructor(@InjectRepository(User) private userRepository: Repository<User>) { }
 
   create(createUserDto: CreateUserDto) {
     return this.userRepository.save(createUserDto)
@@ -20,16 +18,18 @@ export class UsersService {
     return this.userRepository.find()
   }
 
-  findOne(
-    username: string,
-    selectFields?: Array<keyof User>
-  ): Promise<User | undefined> {
+  findOne(username: string, selectFields?: Array<keyof User>): Promise<User | undefined> {
     const fieldsToSelect = selectFields ? selectFields : []
 
     return this.userRepository.findOne({
       where: { username },
       select: ['email', 'fullname', 'id', 'username', ...fieldsToSelect]
     })
+  }
+
+  async isEmailInUse(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { email } })
+    return !!user
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
@@ -42,9 +42,7 @@ export class UsersService {
     const user = await this.findOne(username)
 
     if (!user) {
-      throw new NotFoundException(
-        'Пользователь с таким именем пользователя не существует'
-      )
+      throw new NotFoundException('Пользователь с таким именем пользователя не существует')
     }
 
     return await this.userRepository.remove(user)

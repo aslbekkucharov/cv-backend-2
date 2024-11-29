@@ -21,7 +21,7 @@ export class AuthService {
     private jwtService: JwtService,
     private usersService: UsersService,
     private configService: ConfigService
-  ) {}
+  ) { }
 
   async signIn(payload: SignInDto): Promise<AuthResponse> {
     const user = await this.usersService.findOne(payload.username, ['password'])
@@ -41,19 +41,24 @@ export class AuthService {
 
     return {
       user: omittedUserObject,
-      tokens: { access: token }
+      tokens: {
+        access: token
+      }
     }
   }
 
   async signUp(payload: CreateUserDto): Promise<AuthResponse> {
-    const { username, password } = payload
+    const { username, password, email } = payload
 
+    const isEmailInUse = await this.usersService.isEmailInUse(email)
     const isUsernameInUse = await this.usersService.findOne(username)
 
     if (!!isUsernameInUse) {
-      throw new BadRequestException(
-        'Указанное имя пользователя уже используется'
-      )
+      throw new BadRequestException('Указанное имя пользователя уже используется')
+    }
+
+    if (isEmailInUse) {
+      throw new BadRequestException('Указанная электронная почта уже используется')
     }
 
     const hashedPassword = await hash(
@@ -70,7 +75,9 @@ export class AuthService {
 
     return {
       user: omittedUser,
-      tokens: { access: token }
+      tokens: {
+        access: token
+      }
     }
   }
 }
