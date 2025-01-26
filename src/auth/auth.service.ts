@@ -1,79 +1,25 @@
-import { omit } from 'lodash'
-import { compare, hash } from 'bcrypt'
-import { JwtService } from '@nestjs/jwt'
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException
-} from '@nestjs/common'
+import { compare } from 'bcrypt'
+import { Injectable } from '@nestjs/common'
 
-import { AuthResponse } from './types'
-import { TokenPayload } from 'src/types'
-import SignInDto from './dto/signin.dto'
-import { ConfigService } from '@nestjs/config'
-import { UsersService } from 'src/users/users.service'
-import { CreateUserDto } from 'src/common/dto/create-user.dto'
 
+import { UsersService } from '@/users/users.service'
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwtService: JwtService,
-    private usersService: UsersService,
-    private configService: ConfigService
-  ) { }
 
-  async signIn(payload: SignInDto): Promise<AuthResponse> {
-    const user = await this.usersService.findOne(payload.username, ['password'])
+  constructor(private usersService: UsersService) { }
 
-    if (!user) throw new NotFoundException('Пользователь не найден')
+  async validateUser(username: string, password: string) {
+    const user = await this.usersService.findOne(username)
 
-    const isPasswordMatch = await compare(payload.password, user.password)
+    if (!user) return null
 
-    if (!isPasswordMatch) {
-      throw new UnauthorizedException('Имя пользователя или пароль неверны')
+    const isPasswordsMatch = await compare(password, user?.password)
+
+    if (user && isPasswordsMatch) {
+      return user
     }
 
-    const omittedUserObject = omit(user, ['password'])
-
-    const tokenPayload: TokenPayload = { ...omittedUserObject, id: user.id }
-    const token = await this.jwtService.signAsync(tokenPayload)
-
-    return {
-      user: omittedUserObject,
-      tokens: {
-        access: token
-      }
-    }
+    return null
   }
 
-  async signUp(payload: CreateUserDto): Promise<AuthResponse> {
-    const { username, password, email } = payload
-
-    const isEmailInUse = await this.usersService.isEmailInUse(email)
-    const isUsernameInUse = await this.usersService.findOne(username)
-
-    if (!!isUsernameInUse) {
-      throw new BadRequestException('Указанное имя пользователя уже используется')
-    }
-
-    if (isEmailInUse) {
-      throw new BadRequestException('Указанная электронная почта уже используется')
-    }
-
-    const hashedPassword = await hash(password, +this.configService.get<number>('HASH_SALT'))
-
-    const createdUser = await this.usersService.create({ ...payload, password: hashedPassword })
-    const omittedUser = omit(createdUser, ['password'])
-
-    const tokenPayload = { ...omit(payload, ['password']), id: createdUser.id }
-    const token = await this.jwtService.signAsync(tokenPayload)
-
-    return {
-      user: omittedUser,
-      tokens: {
-        access: token
-      }
-    }
-  }
 }
