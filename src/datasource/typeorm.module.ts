@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
 import { Global, Module } from '@nestjs/common'
 import { User } from '@/users/entities/user.entity'
+import { RefreshToken } from '@/refresh-token/entities/refresh-tokens.entity'
 
 @Global()
 @Module({
@@ -18,8 +19,8 @@ import { User } from '@/users/entities/user.entity'
             username: config.getOrThrow('DATABASE_USER'),
             database: config.getOrThrow('DATABASE_NAME'),
             password: config.getOrThrow('DATABASE_PASSWORD'),
-            entities: [User],
-            migrations: [`${__dirname}/../migrations/*.{ts,js}`],
+            entities: [User, RefreshToken],
+            migrations: [`${__dirname}/../migrations/*.{ts,js}`]
           })
 
           await dataSource.initialize()
@@ -32,8 +33,8 @@ import { User } from '@/users/entities/user.entity'
           throw error
         }
       },
-      inject: [ConfigService],
-    },
-  ],
+      inject: [ConfigService]
+    }
+  ]
 })
-export class TypeOrmDSModule { }
+export class TypeOrmDSModule {}

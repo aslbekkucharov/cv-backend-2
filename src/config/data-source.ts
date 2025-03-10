@@ -1,19 +1,20 @@
-import { configDotenv } from "dotenv"
-import { DataSource, DataSourceOptions } from "typeorm"
+import { configDotenv } from 'dotenv'
+import { DataSource, DataSourceOptions } from 'typeorm'
 
-import { User } from "@/users/entities/user.entity"
+import { User } from '@/users/entities/user.entity'
+import { RefreshToken } from '@/refresh-token/entities/refresh-tokens.entity'
 
 configDotenv()
 
 export const dataSourceOptions: DataSourceOptions = {
-    type: 'postgres',
-    host: process.env.DATABASE_HOST,
-    port: +process.env.DATABASE_PORT!,
-    username: process.env.DATABASE_USER,
-    database: process.env.DATABASE_NAME,
-    password: process.env.DATABASE_PASSWORD,
-    entities: [User],
-    migrations: [`${__dirname}/../migrations/*.{ts,js}`],
+  type: 'postgres',
+  host: process.env.DATABASE_HOST,
+  port: +process.env.DATABASE_PORT!,
+  username: process.env.DATABASE_USER,
+  database: process.env.DATABASE_NAME,
+  password: process.env.DATABASE_PASSWORD,
+  entities: [User, RefreshToken],
+  migrations: [`${__dirname}/../migrations/*.{ts,js}`]
 }
 
 const dataSource = new DataSource(dataSourceOptions)
