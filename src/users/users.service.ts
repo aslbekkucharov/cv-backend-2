@@ -17,6 +17,10 @@ export class UsersService {
     return this.userRepository.findOne({ where: { username } })
   }
 
+  findOneById(id: number) {
+    return this.userRepository.findOneBy({ id })
+  }
+
   isEmailInUse(email: string) {
     return this.userRepository.findOne({ where: { email } })
   }

@@ -17,9 +17,9 @@ export class RefreshToken {
   @Column({ nullable: false })
   device: string
 
+  @Column({ nullable: false, default: true })
+  isActive: boolean
+
   @CreateDateColumn()
   createdAt: Date
-
-  @UpdateDateColumn()
-  updatedAt: Date
 }
