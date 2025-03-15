@@ -1,9 +1,9 @@
 import { Repository } from 'typeorm'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 
 import { RefreshToken } from '@/refresh-token/entities/refresh-tokens.entity'
-import { ConfigService } from '@nestjs/config'
 
 interface RefreshTokenPayload {
   token: string

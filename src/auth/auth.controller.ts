@@ -1,9 +1,9 @@
+import { UAParser } from 'ua-parser-js'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
-import { Controller, Post, UseGuards, Req, Body, Res, UnauthorizedException, InternalServerErrorException } from '@nestjs/common'
+import { Controller, Post, UseGuards, Req, Body, Res, UnauthorizedException, InternalServerErrorException, UsePipes, ValidationPipe } from '@nestjs/common'
 
 import { RequestUser } from '@/types'
-import { UAParser } from 'ua-parser-js'
 import { AuthService } from '@/auth/auth.service'
 import { SignUpDto } from '@/auth/dto/signup.dto'
 import { UsersService } from '@/users/users.service'
@@ -40,8 +40,10 @@ export class AuthController {
   }
 
   @Post('signup')
+  @UsePipes(new ValidationPipe())
   async signUp(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Body() payload: SignUpDto) {
     const device = this.getUserAgent(req)
+
     const tokens = await this.authService.signUp(payload, device)
 
     this.setAuthCookies(res, tokens.refreshToken)

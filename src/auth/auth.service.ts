@@ -32,7 +32,10 @@ export class AuthService {
     const isPasswordsMatch = await compare(password, user.password)
 
     if (!isPasswordsMatch) {
-      throw new UnauthorizedException('Неверный логин или пароль. Пожалуйста, проверьте данные и попробуйте снова.')
+      throw new UnauthorizedException({
+        error: 'incorrect_password',
+        message: 'Неверный логин или пароль. Пожалуйста, проверьте данные и попробуйте снова.'
+      })
     }
 
     return user
@@ -45,8 +48,8 @@ export class AuthService {
   }
 
   async signUp(payload: SignUpDto, device: string) {
-    const isUserExists = await this.usersService.findOne(payload.username)
     const isEmailInUse = await this.usersService.isEmailInUse(payload.email)
+    const isUserExists = await this.usersService.isUsernameExists(payload.username)
 
     if (isUserExists) {
       throw new BadRequestException({

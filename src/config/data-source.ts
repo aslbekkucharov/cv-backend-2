@@ -3,6 +3,7 @@ import { DataSource, DataSourceOptions } from 'typeorm'
 
 import { User } from '@/users/entities/user.entity'
 import { RefreshToken } from '@/refresh-token/entities/refresh-tokens.entity'
+import { Profile } from '@/profiles/entities/profile.entity'
 
 configDotenv()
 
@@ -13,7 +14,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DATABASE_USER,
   database: process.env.DATABASE_NAME,
   password: process.env.DATABASE_PASSWORD,
-  entities: [User, RefreshToken],
+  entities: [User, Profile, RefreshToken],
   migrations: [`${__dirname}/../migrations/*.{ts,js}`]
 }
 

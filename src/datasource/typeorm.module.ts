@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
 import { Global, Module } from '@nestjs/common'
 import { User } from '@/users/entities/user.entity'
+import { Profile } from '@/profiles/entities/profile.entity'
 import { RefreshToken } from '@/refresh-token/entities/refresh-tokens.entity'
 
 @Global()
@@ -19,7 +20,7 @@ import { RefreshToken } from '@/refresh-token/entities/refresh-tokens.entity'
             username: config.getOrThrow('DATABASE_USER'),
             database: config.getOrThrow('DATABASE_NAME'),
             password: config.getOrThrow('DATABASE_PASSWORD'),
-            entities: [User, RefreshToken],
+            entities: [User, Profile, RefreshToken],
             migrations: [`${__dirname}/../migrations/*.{ts,js}`]
           })
 

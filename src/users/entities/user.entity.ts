@@ -1,10 +1,5 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm'
+import { Profile } from '@/profiles/entities/profile.entity'
+import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity()
 export class User {
@@ -25,6 +20,9 @@ export class User {
 
   @Column({ nullable: false })
   password: string
+
+  @OneToOne(() => Profile, profile => profile.user)
+  profile: Profile
 
   @CreateDateColumn()
   createdAt: Date
