@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto'
 import { UAParser } from 'ua-parser-js'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
@@ -7,12 +8,14 @@ import { RequestUser } from '@/types'
 import { AuthService } from '@/auth/auth.service'
 import { SignUpDto } from '@/auth/dto/signup.dto'
 import { UsersService } from '@/users/users.service'
+import { EmailService } from '@/email/email.service'
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly emailService: EmailService
   ) {}
 
   private setAuthCookies(res: Response, refreshToken: string) {
@@ -45,6 +48,14 @@ export class AuthController {
     const device = this.getUserAgent(req)
 
     const tokens = await this.authService.signUp(payload, device)
+
+    await this.emailService.sendEmailConfirmation({
+      otp: 122233,
+      expiryTime: '30',
+      companyName: 'CV Generator',
+      user: { name: payload.name, email: payload.email },
+      companyLogo: 'https://www.spcdn.org/images/promo-logo/correct/sendpulse-logo.svg'
+    })
 
     this.setAuthCookies(res, tokens.refreshToken)
 

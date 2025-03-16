@@ -21,6 +21,9 @@ export class User {
   @Column({ nullable: false })
   password: string
 
+  @Column({ default: false })
+  isEmailVerified: boolean
+
   @OneToOne(() => Profile, profile => profile.user)
   profile: Profile
 
